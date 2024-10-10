@@ -3,32 +3,12 @@
 import { lusitana } from "@/app/ui/fonts";
 import { ArrowRightIcon } from "@heroicons/react/20/solid";
 import { AtSymbolIcon, ExclamationCircleIcon, KeyIcon } from "@heroicons/react/24/outline";
-import { signIn } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useFormState } from "react-dom";
+import { useActionState } from "react";
+import { authenticate } from "../lib/actions";
 import { Button } from "./button";
 
 export default function LoginForm() {
-  const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/";
-  const router = useRouter();
-
-  async function authenticate(prevState: string | undefined, formData: FormData) {
-    const email = formData.get("email");
-    const password = formData.get("password");
-
-    const signInResponse = await signIn("credentials", { email, password, redirect: false });
-
-    if (signInResponse && !signInResponse?.ok) {
-      return signInResponse.error ? signInResponse.error : "Something went wrong.";
-    } else {
-      router.push(callbackUrl);
-      router.refresh();
-    }
-    return "Something went wrong.";
-  }
-
-  const [errorMessage, formAction, isPending] = useFormState(authenticate, undefined);
+  const [errorMessage, formAction, isPending] = useActionState(authenticate, undefined);
 
   return (
     <form action={formAction} className="space-y-3">
